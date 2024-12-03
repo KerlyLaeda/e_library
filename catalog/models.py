@@ -27,7 +27,6 @@ class Book(models.Model):
     display_genre.short_description = "Genre"
 
 
-
 class Author(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)

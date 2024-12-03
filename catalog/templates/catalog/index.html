@@ -1,0 +1,13 @@
+{% extends "catalog/layout.html" %}
+
+{% block content %}
+    <h1>Library Home</h1>
+    <p>Welcome to Library</p>
+
+    <ul>
+        <li>Books: {{ books_num }}</li>
+        <li>Copies total: {{ copies_num }}</li>
+        <li>Copies available: {{ copies_available }}</li>
+        <li>Authors: {{ authors_num }}</li>
+    </ul>
+{% endblock content %}
