@@ -8,11 +8,11 @@ from django.urls import reverse
 
 class Book(models.Model):
     title = models.CharField(max_length=200)
-    author = models.ForeignKey("Author", on_delete=models.RESTRICT, null=True)  # handle > 1 authors?
+    author = models.ForeignKey("Author", on_delete=models.RESTRICT, null=True)  # todo: handle > 1 authors
     summary = models.TextField(max_length=1000, help_text="Enter a brief description of the book.")
     isbn = models.CharField("ISBN", max_length=13, unique=True)
-    genre = models.ManyToManyField("Genre")
-    language = models.ForeignKey("Language", on_delete=models.SET_NULL, null=True)
+    genre = models.ManyToManyField("Genre")  # fix: can select only 1
+    language = models.ForeignKey("Language", on_delete=models.SET_NULL, null=True)  # todo: support multiple langs
 
     def __str__(self):
         return self.title
@@ -20,12 +20,19 @@ class Book(models.Model):
     def get_absolute_url(self):
         return reverse("book-detail", args=[str(self.id)])
 
+    def display_genre(self):
+        """Display genre in admin"""
+        return ", ".join(genre.name for genre in self.genre.all()[:3])
+
+    display_genre.short_description = "Genre"
+
+
 
 class Author(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    dob = models.DateField(blank=True, null=True)
-    dod = models.DateField(blank=True, null=True)
+    date_of_birth = models.DateField(blank=True, null=True)
+    date_of_death = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.last_name}, {self.first_name}"
