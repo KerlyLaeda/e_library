@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+MIDDLEWARE += ["catalog.middleware.SidebarDataMiddleware"]
 
 ROOT_URLCONF = 'e_library.urls'
 

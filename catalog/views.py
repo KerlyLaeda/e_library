@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 from django.views.generic import DetailView, ListView
 from .models import Author, Book, BookInstance, Genre, Language
 
@@ -56,6 +57,17 @@ def search(request):
 
 def advanced_search(request):
     if request.method == "GET":
+        # Check if the query is empty
+        # is_empty_query = all(
+        #     not request.GET.get(param, "").strip()
+        #     for param in ["title", "author", "genres", "languages", "imprint", "isbn"]
+        # ) and not request.GET.get("status")  # Ignore status if it's the only parameter
+        #
+        # if is_empty_query:
+        #     # Redirect to the current page without resetting parameters
+        #     return HttpResponseRedirect(reverse("advanced-search"))
+
+
         # Fetch all genres and languages for dropdowns
         genres = Genre.objects.all()
         languages = Language.objects.all()
@@ -113,7 +125,8 @@ def advanced_search(request):
             return render(request, "catalog/search.html", context)
 
     # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
     # Fallback for GET requests without parameters
     genres = Genre.objects.all()
     languages = Language.objects.all()
-    return render(request, "catalog/advanced_search.html", {"genres": genres, "languages": languages})
+    return render(request, "catalog/search.html", {"genres": genres, "languages": languages})

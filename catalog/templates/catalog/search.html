@@ -7,15 +7,7 @@
 {% block content %}
     <h1>Search results</h1>
     {% if no_results %}
-        <p>No results for
-        {% if query.title %}Title "{{ query.title }}"{% endif %}
-        {% if query.author %}Author {{ query.author }}{% endif %}
-        {% if query.genres %}Genres: {{ query.genres|join:", " }}{% endif %}
-        {% if query.languages %}Languages: {{ query.languages|join:", " }}{% endif %}
-        {% if query.status %}Status {{ query.status|join:", " }}{% endif %}
-        {% if query.imprint %}Publisher "{{ query.imprint }}"{% endif %}
-        {% if query.isbn %}ISBN {{ query.isbn }}{% endif %}
-        </p>
+        <p>No results :(</p>
     {% else %}
     <ul>
         {% for book in results %}
