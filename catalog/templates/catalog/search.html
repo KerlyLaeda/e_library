@@ -1,0 +1,20 @@
+{% extends "catalog/layout.html" %}
+
+{% block title %}
+    <title>Search</title>
+{% endblock title %}
+
+{% block content %}
+    <h1>Search results</h1>
+    {% if no_results %}
+        <p>No results for "{{ query }}" :(</p>
+    {% else %}
+    <ul>
+        {% for book in results %}
+            <li>
+                <a href="{% url 'book-detail' book.id %}">{{ book.title }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock content %}

@@ -8,7 +8,7 @@ from .models import (
 )
 
 
-class BooksInline(admin.TabularInline):
+class BooksInline(admin.StackedInline):
     """
     Inline admin class for displaying books associated with an author.
 
@@ -20,7 +20,7 @@ class BooksInline(admin.TabularInline):
     extra = 0  # to remove placeholders for instances
 
 
-class BooksInstanceInline(admin.TabularInline):
+class BooksInstanceInline(admin.StackedInline):
     """
     Inline admin class for displaying book instances associated with a book.
 

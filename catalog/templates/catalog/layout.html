@@ -24,6 +24,16 @@
                         <li><a href="{% url 'index' %}">Home</a></li>
                         <li><a href="{% url 'books' %}">All books</a></li>
                         <li><a href="{% url 'authors' %}">All authors</a></li>
+
+                        <!-- Quick search -->
+                        <li>
+                            <form method="post" action="{% url 'search' %}">
+                            {% csrf_token %}
+                                <input type="text" name="q" placeholder="Quick search">
+                            </form>
+                        </li>
+
+                        <!-- Advanced search -->
                     </ul>
                 {% endblock sidebar %}
             </div>

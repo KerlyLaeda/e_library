@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import UniqueConstraint
 from django.db.models.functions import Lower
 from django.urls import reverse
+from django.utils.text import slugify
 
 
 class Book(models.Model):
@@ -13,12 +14,22 @@ class Book(models.Model):
     isbn = models.CharField("ISBN", max_length=13, unique=True)
     genre = models.ManyToManyField("Genre")  # fix: can select only 1
     language = models.ForeignKey("Language", on_delete=models.SET_NULL, null=True)  # todo: support multiple langs
+    # slug = models.SlugField(unique=True, blank=True)
 
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
         return reverse("book-detail", args=[str(self.id)])
+
+    # def save(self, *args, **kwargs):
+    #     if not self.slug:
+    #         self.slug = slugify(self.title)
+    #         # unique_slug = slugify(self.title)
+    #         # while Book.objects.filter(slug=unique_slug).exists():
+    #         #     unique_slug = f"{slugify(self.title)}-{uuid.uuid4().hex[:8]}"
+    #         # self.slug = unique_slug
+    #     super().save(*args, **kwargs)
 
     def display_genre(self):
         """Display genre in admin"""
