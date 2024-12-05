@@ -1,7 +1,8 @@
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import DetailView, ListView
-from .models import Author, Book, BookInstance
+from .models import Author, Book, BookInstance, Genre, Language
 
 
 # change index's content later
@@ -41,8 +42,8 @@ class AuthorDetailView(DetailView):
 
 
 def search(request):
-    if request.method == "POST":
-        book_search = request.POST.get("q", "").strip()
+    if request.method == "GET":
+        book_search = request.GET.get("q", "").strip()
         if book_search:
             results = Book.objects.filter(title__icontains=book_search)
             if results.exists():
@@ -52,3 +53,67 @@ def search(request):
         else:  # Empty query
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+
+def advanced_search(request):
+    if request.method == "GET":
+        # Fetch all genres and languages for dropdowns
+        genres = Genre.objects.all()
+        languages = Language.objects.all()
+
+        # Get query parameters
+        title_query = request.GET.get("title", "").strip()
+        author_query = request.GET.get("author", "").strip()
+        genres_query = request.GET.getlist("genres")  # select multiple genres
+        language_query = request.GET.getlist("languages")  # select multiple languages
+        status_query = request.GET.get("status") == "on"  # checkbox
+        publisher_query = request.GET.get("imprint", "").strip()
+        isbn_query = request.GET.get("isbn", "").strip()
+
+        # Build the query with Q
+        query = Q()
+        if title_query:
+            query &= Q(title__icontains=title_query)
+        if author_query:
+            query &= Q(author__last_name__icontains=author_query)
+        if genres_query:
+            query &= Q(genre__in=genres_query)
+        if language_query:
+            query &= Q(language__in=language_query)
+        if isbn_query:
+            query &= Q(isbn=isbn_query)
+
+        # BookInstance-specific filters
+        if status_query:
+            query &= Q(bookinstance__status="a")
+        if publisher_query:
+            query &= Q(bookinstance__imprint__icontains=publisher_query)
+
+        # Perform the query
+        results = Book.objects.filter(query).distinct().order_by("title")
+
+        context = {
+            "results": results,
+            "genres": genres,
+            "languages": languages,
+            "query": {
+                "title": title_query,
+                "author": author_query,
+                "genres": genres_query,
+                "languages": language_query,
+                "status": status_query,
+                "imprint": publisher_query,
+                "isbn": isbn_query,
+            },
+        }
+
+        if results.exists():
+            return render(request, "catalog/search.html", context)
+        else:
+            context["no_results"] = True
+            return render(request, "catalog/search.html", context)
+
+    # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    # Fallback for GET requests without parameters
+    genres = Genre.objects.all()
+    languages = Language.objects.all()
+    return render(request, "catalog/advanced_search.html", {"genres": genres, "languages": languages})

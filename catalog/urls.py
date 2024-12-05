@@ -13,5 +13,6 @@ urlpatterns = [
     path("authors/", views.AuthorListView.as_view(), name="authors"),
     path("author/<int:pk>", views.AuthorDetailView.as_view(), name="author-detail"),
 
-    path("search/", views.search, name="search")
+    path("search/", views.search, name="search"),
+    path("advanced_search/", views.advanced_search, name="advanced-search")
 ]

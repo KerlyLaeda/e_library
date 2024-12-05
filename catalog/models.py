@@ -1,5 +1,6 @@
 import uuid
 
+from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import UniqueConstraint
 from django.db.models.functions import Lower
@@ -11,7 +12,14 @@ class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.ForeignKey("Author", on_delete=models.RESTRICT, null=True)  # todo: handle > 1 authors
     summary = models.TextField(max_length=1000, help_text="Enter a brief description of the book.")
-    isbn = models.CharField("ISBN", max_length=13, unique=True)
+    isbn = models.CharField("ISBN",
+                            max_length=13,
+                            unique=True,
+                            validators=[
+                                RegexValidator(
+                                    regex=r"^\d{10}(\d{3})?$",  # Matches ISBN-10 or ISBN-13
+                                )
+                            ])
     genre = models.ManyToManyField("Genre")  # fix: can select only 1
     language = models.ForeignKey("Language", on_delete=models.SET_NULL, null=True)  # todo: support multiple langs
     # slug = models.SlugField(unique=True, blank=True)
