@@ -57,18 +57,19 @@ def search(request):
 
 def advanced_search(request):
     if request.method == "GET":
+        # If user submits an empty form,
+        # render the current page without displaying all books in db
         # Check if the query is empty
-        # is_empty_query = all(
-        #     not request.GET.get(param, "").strip()
-        #     for param in ["title", "author", "genres", "languages", "imprint", "isbn"]
-        # ) and not request.GET.get("status")  # Ignore status if it's the only parameter
-        #
-        # if is_empty_query:
-        #     # Redirect to the current page without resetting parameters
-        #     return HttpResponseRedirect(reverse("advanced-search"))
+        is_empty_query = all(
+            not request.GET.get(param, "").strip()
+            for param in ["title", "author", "genres", "languages", "imprint", "isbn"]
+        ) and not request.GET.get("status")
 
+        if is_empty_query:
+            # Redirect to the current page without resetting parameters
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-        # Fetch all genres and languages for dropdowns
+        # Fetch all genres and languages for select fields
         genres = Genre.objects.all()
         languages = Language.objects.all()
 
@@ -123,8 +124,6 @@ def advanced_search(request):
         else:
             context["no_results"] = True
             return render(request, "catalog/search.html", context)
-
-    # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     # Fallback for GET requests without parameters
     genres = Genre.objects.all()
