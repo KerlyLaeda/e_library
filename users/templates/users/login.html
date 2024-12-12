@@ -31,10 +31,10 @@
     <input type="hidden" name="next" value="{{ next }}">
     </form>
 
-    <p><a href="">Forgot your password?</a></p>
+    <p><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
     <div class="border-top pt-3">
         <small class="text-muted">
-            Need an account? <a href="{% url 'register' %}" class="ml-2">Register</a>
+            Don't have an account? <a href="{% url 'register' %}" class="ml-2">Register</a>
         </small>
     </div>
 {% endblock content %}

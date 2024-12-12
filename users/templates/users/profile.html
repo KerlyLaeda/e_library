@@ -1,5 +1,17 @@
 {% extends "catalog/layout.html" %}
 
 {% block content %}
-    {{ user.username }} profile
+    user profile<br>
+    {{ user.username }}<br>
+    {{ user.email }}<br>
+    <img src="{{ user.profile.pic.url }}">
+    <form method="post" enctype="multipart/form-data">  <!-- to save image -->
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom">update profile</legend>
+            {{ u_form }}
+            {{ p_form }}
+        </fieldset>
+        <button type="submit" class="btn btn-outline-info">save changes</button>
+    </form>
 {% endblock content %}
