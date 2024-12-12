@@ -1,5 +1,6 @@
 import uuid
 
+from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import UniqueConstraint
@@ -38,6 +39,13 @@ class Book(models.Model):
     #         #     unique_slug = f"{slugify(self.title)}-{uuid.uuid4().hex[:8]}"
     #         # self.slug = unique_slug
     #     super().save(*args, **kwargs)
+
+    @property
+    def is_available(self):
+        # Check if at least one copy (instance) is available
+        return self.bookinstance_set.filter(status="a").exists()
+
+
 
     def display_genre(self):
         """Display genre in admin"""
@@ -88,7 +96,7 @@ class BookInstance(models.Model):
     due_back = models.DateField(null=True, blank=True)
     book = models.ForeignKey(Book, on_delete=models.RESTRICT, null=True)
     imprint = models.CharField(max_length=200)
-    #borrower = User
+    borrower = User
 
     LOAN_STATUS = (
         ("a", "Available"),

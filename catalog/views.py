@@ -1,6 +1,6 @@
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import DetailView, ListView
 from .models import Author, Book, BookInstance, Genre, Language
@@ -129,3 +129,17 @@ def advanced_search(request):
     genres = Genre.objects.all()
     languages = Language.objects.all()
     return render(request, "catalog/search.html", {"genres": genres, "languages": languages})
+
+
+# make it class method
+def borrow(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    if request.method == "POST":
+        instance = book.bookinstance_set.filter(status="a").first()
+        if instance:
+            instance.status = "o"
+            instance.borrower = request.user
+            instance.save()
+            return redirect("book-detail", pk=book.pk)
+    else:
+        return redirect("index")

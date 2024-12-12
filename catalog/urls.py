@@ -7,8 +7,9 @@ urlpatterns = [
     path("books/", views.BookListView.as_view(), name="books"),
 
     # catalog/book/<id> or catalog/books/book/<id> ?
-    path("book/<int:pk>", views.BookDetailView.as_view(), name="book-detail"),
+    path("book/<int:pk>/", views.BookDetailView.as_view(), name="book-detail"),
     #re_path(r"^book/(?P<slug>[-\w]+)$", views.BookDetailView.as_view(), name="book-detail"),
+    path("book/<int:pk>/borrow", views.borrow, name="borrow"),
 
     path("authors/", views.AuthorListView.as_view(), name="authors"),
     path("author/<int:pk>", views.AuthorDetailView.as_view(), name="author-detail"),

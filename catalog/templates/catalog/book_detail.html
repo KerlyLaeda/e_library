@@ -9,6 +9,22 @@
     <p>Language: {{ book.language }}</p>
     <p>Genre: {{ book.genre.all|join:", " }}</p>
 
+    <!-- If at least 1 instance is available, can borrow -->
+    {% if book.is_available %}
+        <p>{{ book.title }} is available to borrow!</p>
+        <form method="post" action="{% url 'borrow' book.id %}">
+            {% csrf_token %}
+            <button type="submit">borrow</button> <!-- also add on homepage-->
+        </form>
+    {% else %}
+        <p>{{ book.title }} is currently unavailable.</p>
+        <form method="post" action="">
+             {% csrf_token %}
+             <button type="submit">does nuthin (reserve)</button>
+        </form>
+    {% endif %}
+
+    <!-- whats the point of displaying all instances -->
     <div style="margin-left:20px;margin-top:20px">
         <h4>Copies</h4>
 
