@@ -16,6 +16,9 @@
             {% csrf_token %}
             <button type="submit">borrow</button> <!-- also add on homepage-->
         </form>
+
+    <!-- If book is borrowed by current user, display return button -->
+    <!-- If by another user, display reserve button -->
     {% else %}
         <p>{{ book.title }} is currently unavailable.</p>
         <form method="post" action="">
@@ -23,6 +26,7 @@
              <button type="submit">does nuthin (reserve)</button>
         </form>
     {% endif %}
+
 
     <!-- whats the point of displaying all instances -->
     <div style="margin-left:20px;margin-top:20px">

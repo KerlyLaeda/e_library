@@ -1,9 +1,12 @@
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.generic import DetailView, ListView
 from .models import Author, Book, BookInstance, Genre, Language
+import datetime
 
 
 # change index's content later
@@ -132,14 +135,58 @@ def advanced_search(request):
 
 
 # make it class method
+@login_required
 def borrow(request, pk):
     book = get_object_or_404(Book, pk=pk)
+    day_borrowed = datetime.datetime.now()
     if request.method == "POST":
         instance = book.bookinstance_set.filter(status="a").first()
         if instance:
             instance.status = "o"
             instance.borrower = request.user
+            instance.due_back = day_borrowed + datetime.timedelta(weeks=2)
             instance.save()
             return redirect("book-detail", pk=book.pk)
     else:
         return redirect("index")
+
+# with method
+# def borrow_book(request, pk):
+#     book = get_object_or_404(Book, pk=pk)
+#     if book.borrow(request.user):
+#         return redirect("book-detail", pk=book.pk)
+
+
+class LoanedByUserView(LoginRequiredMixin, ListView):
+    """Generic view listing books on loan to current user."""
+    model = BookInstance
+    template_name = "catalog/bookinstance_list_borrowed_user.html"
+    paginate_by = 10  # remove if add quantity restriction
+
+    def get_queryset(self):
+        return (BookInstance.objects.filter(borrower=self.request.user)
+                .filter(status__exact="o")
+                .order_by("due_back"))
+
+
+# user can return clicking a button, also need autoreturn if expired
+@login_required
+def return_book(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    if request.method == "POST":
+        instance = book.bookinstance_set.filter(status="o").first()  # ?
+        if instance:
+            instance.status = "a"
+            instance.borrower = None
+            instance.due_back = None
+            instance.save()
+            return redirect("book-detail", pk=book.pk)
+    else:
+        return redirect("index")
+
+    # autoreturn
+    #if instance.due_back = datetime.datetime.now()
+    # instance.status = "a"
+    # instance.borrower = None
+    # instance.due_back = None
+    # instance.save()

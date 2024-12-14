@@ -45,7 +45,14 @@ class Book(models.Model):
         # Check if at least one copy (instance) is available
         return self.bookinstance_set.filter(status="a").exists()
 
-
+    # def borrow(self, user):
+    #     available_copy = self.bookinstance_set.filter(status="a").first()
+    #     if available_copy:
+    #         available_copy.status = "o"
+    #         available_copy.borrower = user
+    #         available_copy.save()
+    #         return True
+    #     return False
 
     def display_genre(self):
         """Display genre in admin"""
@@ -96,16 +103,16 @@ class BookInstance(models.Model):
     due_back = models.DateField(null=True, blank=True)
     book = models.ForeignKey(Book, on_delete=models.RESTRICT, null=True)
     imprint = models.CharField(max_length=200)
-    borrower = User
+    borrower = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     LOAN_STATUS = (
         ("a", "Available"),
-        ("m", "Maintenance"),
+        ("m", "Maintenance"),  # ?
         ("o", "On loan"),
         ("r", "Reserved"),
     )
 
-    status = models.CharField(max_length=1, choices=LOAN_STATUS, blank=True, default="m")
+    status = models.CharField(max_length=1, choices=LOAN_STATUS, blank=True, default="m")  # default a?
 
     def __str__(self):
         return f"{self.id} ({self.book.title})"

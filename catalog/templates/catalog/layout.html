@@ -21,14 +21,15 @@
             <div class="col-sm-2">
                 {% block sidebar %}
                     {% if user.is_authenticated %}
-                        <a href="{% url 'profile' %}">profile</a>
+                        <a href="{% url 'profile' %}">Profile</a>
+                        <a href="{% url 'user-borrowed' %}">My books</a>
                         <form method="post" action="{% url 'logout' %}">
                             {% csrf_token %}
-                            <button type="submit">logout</button>
+                            <button type="submit">Logout</button>
                         </form>
                     {% else %}
-                        <a href="{% url 'login' %}">log in</a>
-                        <a href="{% url 'register' %}">register</a>
+                        <a href="{% url 'login' %}">Log in</a>
+                        <a href="{% url 'register' %}">Register</a>
                     {% endif %}
                     <ul class="sidebar-nav">
                         <li><a href="{% url 'index' %}">Home</a></li>
