@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
@@ -5,6 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.generic import DetailView, ListView
+from django.utils.timezone import now
 from .models import Author, Book, BookInstance, Genre, Language
 import datetime
 
@@ -138,23 +140,27 @@ def advanced_search(request):
 @login_required
 def borrow(request, pk):
     book = get_object_or_404(Book, pk=pk)
-    day_borrowed = datetime.datetime.now()
     if request.method == "POST":
+
+        # Check if the user already borrowed a copy of this book
+        if BookInstance.objects.filter(book=book, borrower=request.user, status="o").exists():
+            messages.error(request, "You have already borrowed this book.")
+            return redirect("book-detail", pk=book.pk)
+
+        # Borrow the book
         instance = book.bookinstance_set.filter(status="a").first()
         if instance:
             instance.status = "o"
             instance.borrower = request.user
-            instance.due_back = day_borrowed + datetime.timedelta(weeks=2)
+            instance.due_back = now() + datetime.timedelta(weeks=2)
             instance.save()
+            messages.success(request, f'You borrowed "{book.title}"!')
             return redirect("book-detail", pk=book.pk)
     else:
-        return redirect("index")
-
-# with method
-# def borrow_book(request, pk):
-#     book = get_object_or_404(Book, pk=pk)
-#     if book.borrow(request.user):
-#         return redirect("book-detail", pk=book.pk)
+        # No available copies
+        messages.error(request, f'Sorry, "{book.title}" is not available. You can reserve it clicking the button below')  # change this
+        return redirect("book-detail", pk=book.pk)
+    return redirect("index")
 
 
 class LoanedByUserView(LoginRequiredMixin, ListView):
@@ -174,19 +180,11 @@ class LoanedByUserView(LoginRequiredMixin, ListView):
 def return_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
     if request.method == "POST":
-        instance = book.bookinstance_set.filter(status="o").first()  # ?
+        instance = book.bookinstance_set.filter(status="o", borrower=request.user).first()  # ?
         if instance:
             instance.status = "a"
             instance.borrower = None
             instance.due_back = None
             instance.save()
-            return redirect("book-detail", pk=book.pk)
-    else:
-        return redirect("index")
-
-    # autoreturn
-    #if instance.due_back = datetime.datetime.now()
-    # instance.status = "a"
-    # instance.borrower = None
-    # instance.due_back = None
-    # instance.save()
+            return redirect("user-borrowed")
+    return redirect("index")

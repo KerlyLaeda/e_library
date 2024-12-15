@@ -14,7 +14,7 @@
         <p>{{ book.title }} is available to borrow!</p>
         <form method="post" action="{% url 'borrow' book.id %}">
             {% csrf_token %}
-            <button type="submit">borrow</button> <!-- also add on homepage-->
+            <button type="submit">Borrow</button> <!-- also add on homepage-->
         </form>
 
     <!-- If book is borrowed by current user, display return button -->
